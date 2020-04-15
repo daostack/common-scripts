@@ -1,33 +1,18 @@
-const { Arc } = require('@daostack/client-experimental')
+// NOTW ORKING!
 const { first } = require('rxjs/operators')
 const assert = require('assert')
 const path = require('path')
 const ethers = require('ethers')
-
-const CONTRACT_VERSION = '0.1.1-rc.12'
-const pathToABIs = path.join(require.resolve('@daostack/migration-experimental'), '..', 'contracts', CONTRACT_VERSION)
-
-// private key of this address: 0xea64B1E098432e12c51694648A21c57ACE7621c4
-const PRIVATE_KEY = 'D865F557C088E1F7BDFB87D359F9E244C73272BDC39CB7CC1898D7A348A4BF2C'
+const { getArcAndWallet, pathToABIs } = require('./settings')
 
 
 
 async function triggerEvent() {
 
+    throw Error('not working right now :-)')
+    const { arc, wallet } = await getArcAndWallet()
     // latest settings are from https://daostack1.atlassian.net/wiki/spaces/CMN/pages/11731016/Developer+Resources
-    const arc = new Arc({
-        graphqlHttpProvider: "https://api.thegraph.com/subgraphs/name/daostack/v7_2_exp_rinkeby",
-        graphqlWsProvider: "wss://api.thegraph.com/subgraphs/name/daostack/v7_2_exp_rinkeby",
-        web3Provider: `wss://rinkeby.infura.io/ws/v3/e0cdf3bfda9b468fa908aa6ab03d5ba2`,
-    })
-    await arc.fetchContractInfos()
-
-    const infuraProvider = new ethers.providers.InfuraProvider('rinkeby', 'e0cdf3bfda9b468fa908aa6ab03d5ba2')
-    arc.web3 = infuraProvider
-
-    const wallet = new ethers.Wallet(PRIVATE_KEY, arc.web3)
-
-    // balance of current account
+   // balance of current account
 
 
     // get a list of DAOs
@@ -38,6 +23,7 @@ async function triggerEvent() {
     console.log(`using dao ${daoState.name}`)
     const schemes = await dao.schemes().pipe(first()).toPromise()
     // console.log(schemes)
+
     console.log('Schemes in this DAO')
     for (const scheme of schemes) {
         schemeState = await scheme.fetchState()
@@ -67,7 +53,6 @@ async function triggerEvent() {
         // getContract does not work with inFURE
         // const contract = arc.getContract(requestToJoinSchemeState.address, abi)
         const contract = new ethers.Contract(requestToJoinSchemeState.address, abi, wallet)
-        const method = 'proposeToJoin'
         const feeAmount = 101 // this i sthe minimal fee amount
         const descriptionHash = 'some string'
 
