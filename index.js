@@ -2,9 +2,13 @@ const { Arc } = require('@daostack/client-experimental')
 const { first } = require('rxjs/operators')
 const assert = require('assert')
 const path = require('path')
+const ethers = require('ethers')
 
 const CONTRACT_VERSION = '0.1.1-rc.12'
 const pathToABIs = path.join(require.resolve('@daostack/migration-experimental'), '..', 'contracts', CONTRACT_VERSION)
+
+// private key of this address: 0xea64B1E098432e12c51694648A21c57ACE7621c4
+const PRIVATE_KEY = 'D865F557C088E1F7BDFB87D359F9E244C73272BDC39CB7CC1898D7A348A4BF2C'
 
 
 
@@ -17,6 +21,14 @@ async function triggerEvent() {
         web3Provider: `wss://rinkeby.infura.io/ws/v3/e0cdf3bfda9b468fa908aa6ab03d5ba2`,
     })
     await arc.fetchContractInfos()
+
+    const infuraProvider = new ethers.providers.InfuraProvider('rinkeby', 'e0cdf3bfda9b468fa908aa6ab03d5ba2')
+    arc.web3 = infuraProvider
+
+    const wallet = new ethers.Wallet(PRIVATE_KEY, arc.web3)
+
+    // balance of current account
+
 
     // get a list of DAOs
     const daos = await arc.daos({where: {name: "DAOlightful"}}).first()
@@ -52,18 +64,39 @@ async function triggerEvent() {
         // https://github.com/daostack/arc/blob/arc-factory/contracts/schemes/JoinAndQuit.sol
         // console.log(fundingRequestSchemeState)
         const abi = require(path.join(pathToABIs, 'JoinAndQuit.json')).abi
-        const contract = arc.getContract(requestToJoinSchemeState.address, abi)
+        // getContract does not work with inFURE
+        // const contract = arc.getContract(requestToJoinSchemeState.address, abi)
+        const contract = new ethers.Contract(requestToJoinSchemeState.address, abi, wallet)
         const method = 'proposeToJoin'
-        const feeAmount = 10
-        const descriptionHash = 'xxx'
+        const feeAmount = 101 // this i sthe minimal fee amount
+        const descriptionHash = 'some string'
 
         const args = [
            descriptionHash, 
            feeAmount
         ] 
-        const tx = arc.sendTransaction({ contract, method, args})
-        const result = await tx.send()
+        let tx
+        try {
+            tx = await contract.proposeToJoin(descriptionHash, feeAmount, { gasLimit: 750000, value: feeAmount})
+        } catch (err) {
+            console.log(err)
+            console.log(err.reason)
+            throw err
+        }
+        // console.log(tx)
+        console.log(`Waiting for the transaction to be mined...`)
+        let result
+        try {
+            result = await tx.wait()
+        } catch (err) {
+            console.log(err)
+            console.log(err.reason)
+            throw err
+        }
         console.log(result)
+        // instead of the wollofinw lines, which are not working with infura + ethers.js
+        // const tx = arc.sendTransaction({ contract, method, args})
+        // const result = await tx.send()
         
 
     }
