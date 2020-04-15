@@ -2,7 +2,7 @@
 // 
 const path = require('path')
 const ethers = require('ethers')
-const { getArcAndWallet, pathToABIs, DAOFACTORY_ADDRESS, WALLET_ADDRESS } = require('./settings')
+const { getArcAndWallet, pathToABIs, CONTRACT_ADDRESSES, WALLET_ADDRESS } = require('./settings')
 const {getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory')
 const OVERRIDES =  { gasLimit: 750000, value: 0}
 
@@ -12,6 +12,8 @@ async function createCommon() {
     const daoFactoryAbi = require(path.join(pathToABIs, 'DAOFactory.json')).abi
     // getContract does not work with inFURE
     // const contract = arc.getContract(requestToJoinSchemeState.address, abi)
+    const DAOFACTORY_ADDRESS = CONTRACT_ADDRESSES.DAOFactoryInstance
+
     console.log(`using DAOFactory instance @ ${DAOFACTORY_ADDRESS}`)
     const daoFactoryContract = new ethers.Contract(DAOFACTORY_ADDRESS, daoFactoryAbi, wallet)
 
@@ -36,7 +38,7 @@ async function createCommon() {
 //         ...getSetSchemesData({
 //           DAOFactoryInstance: '0x565737926597B88da5B851cd2e3d7Ad7F68bAc7F',
 //           avatar: '0xbebd9f11b0517a209a2e154635f0dc3d61aa4011',
-//           votingMachine: '0x59EC3731Dca0512678A5F6507d79Cf631005cAd4',
+//           votingMachine: CONTRACT_ADDRESSES.GenesisProtocol,
 //           joinAndQuitVoteParams:
 //             '0x1000000000000000000000000000000000000000000000000000000000000000',
 //           fundingRequestVoteParams:

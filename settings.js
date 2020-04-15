@@ -2,14 +2,15 @@ const path = require('path')
 const { Arc } = require('@daostack/client-experimental')
 const ethers = require('ethers')
 // this value should coincide with the "migration-experimental" versoin
-const CONTRACT_VERSION = '0.1.1-rc.13'
+const CONTRACT_VERSION = '0.1.1-rc.12'
 const NETWORK = 'rinkeby'
 const pathToABIs = path.join(require.resolve('@daostack/migration-experimental'), '..', 'contracts', CONTRACT_VERSION)
 
 
 // not sure where this comes from ..
-const DAOFACTORY_ADDRESS = require(path.join(require.resolve('@daostack/migration-experimental'), '..', 'migration.json'))
-    [NETWORK].package[CONTRACT_VERSION].DAOFactoryInstance
+const CONTRACT_ADDRESSES = require(path.join(require.resolve('@daostack/migration-experimental'), '..', 'migration.json'))
+    [NETWORK].package[CONTRACT_VERSION]
+
 
 // private key of this address: 
 const WALLET_ADDRESS = '0xea64B1E098432e12c51694648A21c57ACE7621c4'
@@ -34,5 +35,5 @@ module.exports = {
     WALLET_ADDRESS,
     getArcAndWallet, 
     pathToABIs,
-    DAOFACTORY_ADDRESS 
+    CONTRACT_ADDRESSES
 }

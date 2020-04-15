@@ -5,9 +5,9 @@
   "license": "MIT",
   "dependencies": {
     "@daostack/client-experimental": "1.0.0-rc.1",
-    "@daostack/migration-experimental": "0.1.1-rc.13-v0",
+    "@daostack/migration-experimental": "0.1.1-rc.12-v0",
     "apollo-link": "^1.2.14",
-    "@daostack/common-factory": "1.1.0",
+    "@daostack/common-factory": "1.0.0",
     "eslint": "^6.8.0"
   },
   "scripts": {
