@@ -2,7 +2,7 @@ const path = require('path')
 const { Arc } = require('@daostack/client-experimental')
 const ethers = require('ethers')
 // this value should coincide with the "migration-experimental" versoin
-const CONTRACT_VERSION = '0.1.1-rc.12'
+const CONTRACT_VERSION = '0.1.1-rc.13'
 const NETWORK = 'rinkeby'
 const pathToABIs = path.join(require.resolve('@daostack/migration-experimental'), '..', 'contracts', CONTRACT_VERSION)
 
@@ -19,8 +19,8 @@ const PRIVATE_KEY = 'D865F557C088E1F7BDFB87D359F9E244C73272BDC39CB7CC1898D7A348A
     async function getArcAndWallet() {
 
     const arc = new Arc({
-        graphqlHttpProvider: "https://api.thegraph.com/subgraphs/name/daostack/v7_2_exp_rinkeby",
-        graphqlWsProvider: "wss://api.thegraph.com/subgraphs/name/daostack/v7_2_exp_rinkeby",
+        graphqlHttpProvider: "https://api.thegraph.com/subgraphs/name/daostack/v7_4_exp_rinkeby",
+        graphqlWsProvider: "wss://api.thegraph.com/subgraphs/name/daostack/v7_4_exp_rinkeby",
         web3Provider: `wss://rinkeby.infura.io/ws/v3/e0cdf3bfda9b468fa908aa6ab03d5ba2`,
     })
     await arc.fetchContractInfos()

@@ -5,7 +5,7 @@ const ethers = require('ethers')
 const { getArcAndWallet, pathToABIs, CONTRACT_ADDRESSES, WALLET_ADDRESS } = require('./settings')
 const {getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory')
 // const {getForgeOrgData, getSetSchemesData } = require('commonfactory')
-const OVERRIDES =  { gasLimit: 750000, value: 0}
+const OVERRIDES =  { gasLimit: 7500000, value: 0}
 
 async function createCommon() {
     const { arc, wallet } = await getArcAndWallet();
@@ -23,7 +23,6 @@ async function createCommon() {
             DAOFactoryInstance: DAOFACTORY_ADDRESS,
             orgName: 'Created by CommonScripts',
             founderAddresses: [WALLET_ADDRESS],
-            tokenDist: [0],
             repDist: [100]
         })
     // console.log('FORGE ORG DATA: ', forgeOrgData);
@@ -34,42 +33,38 @@ async function createCommon() {
 
 
     console.log(`Calling DAOFactory.setSchemes(...)`)
+    
+    // TODO: Use proper IPFS hash
+    let ipfsHash = 'metaData'
+    try {
+      const schemeData = [
+        ...getSetSchemesData({
+          DAOFactoryInstance: '0x565737926597B88da5B851cd2e3d7Ad7F68bAc7F',
+          avatar: '0xbebd9f11b0517a209a2e154635f0dc3d61aa4011',
+          votingMachine: CONTRACT_ADDRESSES.GenesisProtocol,
+          fundingToken: '0x0000000000000000000000000000000000000000',
+          minFeeToJoin: 100,
+          memberReputation: 100,
+          goal: 1000,
+          deadline: (await arc.web3.getBlock('latest')).timestamp + 3000,
+          metaData: ipfsHash,
+        }),
+      ];
 
-//     try {
-//       const schemeData = [
-//         ...getSetSchemesData({
-//           DAOFactoryInstance: '0x565737926597B88da5B851cd2e3d7Ad7F68bAc7F',
-//           avatar: '0xbebd9f11b0517a209a2e154635f0dc3d61aa4011',
-//           votingMachine: CONTRACT_ADDRESSES.GenesisProtocol,
-//           joinAndQuitVoteParams:
-//             '0x1000000000000000000000000000000000000000000000000000000000000000',
-//           fundingRequestVoteParams:
-//             '0x1100000000000000000000000000000000000000000000000000000000000000',
-//           schemeFactoryVoteParams:
-//             '0x1110000000000000000000000000000000000000000000000000000000000000',
-//           fundingToken: '0x0000000000000000000000000000000000000000',
-//           minFeeToJoin: 100,
-//           memberReputation: 100,
-//           goal: 1000,
-//           deadline: (await provider.getBlock('latest')).timestamp + 3000,
-//           metaData: ipfsHash,
-//         }),
-//       ];
+      console.log('SCHEME DATA: ', schemeData);
+    //   const {hash} = await manager.writeSmartContract(
+    //     '0x565737926597B88da5B851cd2e3d7Ad7F68bAc7F',
+    //     DAOFactory,
+    //     'setSchemes',
+    //     schemeData,
+    //   );
+    //   setTxHash(hash);
+    } catch (e) {
+      throw 'Send transaction failed with error: ' + e;
+    }
 
-//       console.log('SCHEME DATA: ', schemeData);
-//       const {hash} = await manager.writeSmartContract(
-//         '0x565737926597B88da5B851cd2e3d7Ad7F68bAc7F',
-//         DAOFactory,
-//         'setSchemes',
-//         schemeData,
-//       );
-//       setTxHash(hash);
-//     } catch (e) {
-//       throw 'Send transaction failed with error: ' + e;
-//     }
-//   };
     process.exit(0)
-}
+};
 
 
 createCommon().catch((err) => {console.log(err); process.exit(0)})
