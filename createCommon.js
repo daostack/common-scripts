@@ -8,62 +8,60 @@ const {getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory'
 const OVERRIDES =  { gasLimit: 7500000, value: 0}
 
 async function createCommon() {
-    const { arc, wallet } = await getArcAndWallet();
+  let tx;
+  let receipt
+  const { arc, wallet } = await getArcAndWallet();
 
-    const daoFactoryAbi = require(path.join(pathToABIs, 'DAOFactory.json')).abi
-    // getContract does not work with inFURE
-    // const contract = arc.getContract(requestToJoinSchemeState.address, abi)
-    const DAOFACTORY_ADDRESS = CONTRACT_ADDRESSES.DAOFactoryInstance
+  const daoFactoryAbi = require(path.join(pathToABIs, 'DAOFactory.json')).abi
+  // getContract does not work the current client version, cf https://github.com/daostack/client/issues/445
+  // const contract = arc.getContract(requestToJoinSchemeState.address, abi)
 
-    console.log(`using DAOFactory instance @ ${DAOFACTORY_ADDRESS}`)
-    const daoFactoryContract = new ethers.Contract(DAOFACTORY_ADDRESS, daoFactoryAbi, wallet)
+  console.log(`using DAOFactory instance @ ${CONTRACT_ADDRESSES.DAOFactoryInstance}`)
+  const daoFactoryContract = new ethers.Contract(CONTRACT_ADDRESSES.DAOFactoryInstance, daoFactoryAbi, wallet)
 
-    const forgeOrgData = 
-        getForgeOrgData({
-            DAOFactoryInstance: DAOFACTORY_ADDRESS,
-            orgName: 'Created by CommonScripts',
-            founderAddresses: [WALLET_ADDRESS],
-            repDist: [100]
-        })
-    // console.log('FORGE ORG DATA: ', forgeOrgData);
-    console.log(`Calling DAOFactory.forgeOrg(...)`)
-    const tx = await daoFactoryContract.forgeOrg(...forgeOrgData, OVERRIDES)
-    const result = await tx.wait()
-    console.log(result)
+  const forgeOrgData = 
+      getForgeOrgData({
+          DAOFactoryInstance: CONTRACT_ADDRESSES.DAOFactoryInstance,
+          orgName: 'Created by CommonScripts',
+          founderAddresses: [WALLET_ADDRESS],
+          repDist: [100]
+      })
+  // console.log('FORGE ORG DATA: ', forgeOrgData);
+  console.log(`Calling DAOFactory.forgeOrg(...)`)
+  tx = await daoFactoryContract.forgeOrg(...forgeOrgData, OVERRIDES)
+  receipt = await tx.wait()
+  // console.log(receipt)
+  // get the new avatar address of the thing that was just created..
+  const newOrgEvent = receipt.events.filter((e) => e.event === 'NewOrg')[0]
+  // console.log(newOrgEvent)
+  const newOrgAddress = newOrgEvent.args['_avatar']
 
 
-    console.log(`Calling DAOFactory.setSchemes(...)`)
-    
-    // TODO: Use proper IPFS hash
-    let ipfsHash = 'metaData'
-    try {
-      const schemeData = [
-        ...getSetSchemesData({
-          DAOFactoryInstance: '0x565737926597B88da5B851cd2e3d7Ad7F68bAc7F',
-          avatar: '0xbebd9f11b0517a209a2e154635f0dc3d61aa4011',
-          votingMachine: CONTRACT_ADDRESSES.GenesisProtocol,
-          fundingToken: '0x0000000000000000000000000000000000000000',
-          minFeeToJoin: 100,
-          memberReputation: 100,
-          goal: 1000,
-          deadline: (await arc.web3.getBlock('latest')).timestamp + 3000,
-          metaData: ipfsHash,
-        }),
-      ];
+  console.log(`Calling DAOFactory.setSchemes(...)`)
+  
+  // TODO: Use proper IPFS hash
+  let ipfsHash = 'metaData'
+  // deadline in Ethereum time, where 1 unit = 1 second (I think)
+  const deadLine = (await arc.web3.getBlock('latest')).timestamp + 3000
+  console.log(deadLine)
+  const schemeData = getSetSchemesData({
+      DAOFactoryInstance: CONTRACT_ADDRESSES.DAOFactoryInstance,
+      avatar: newOrgAddress,
+      votingMachine: CONTRACT_ADDRESSES.GenesisProtocol,
+      fundingToken: '0x0000000000000000000000000000000000000000',
+      minFeeToJoin: 100,
+      memberReputation: 100,
+      goal: 1000,
+      deadLine,
+      metaData: ipfsHash,
+    })
 
-      console.log('SCHEME DATA: ', schemeData);
-    //   const {hash} = await manager.writeSmartContract(
-    //     '0x565737926597B88da5B851cd2e3d7Ad7F68bAc7F',
-    //     DAOFactory,
-    //     'setSchemes',
-    //     schemeData,
-    //   );
-    //   setTxHash(hash);
-    } catch (e) {
-      throw 'Send transaction failed with error: ' + e;
-    }
+  console.log('SCHEME DATA: ', schemeData);
+  tx = await daoFactoryContract.setSchemes(...schemeData, OVERRIDES)
+  receipt = await tx.wait()
+  console.log(receipt)
 
-    process.exit(0)
+  process.exit(0)
 };
 
 

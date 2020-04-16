@@ -1,5 +1,5 @@
 const path = require('path')
-const { Arc } = require('@daostack/client-experimental')
+const { Arc } = require('@daostack/client')
 const ethers = require('ethers')
 // this value should coincide with the "migration-experimental" versoin
 const CONTRACT_VERSION = '0.1.1-rc.13'
