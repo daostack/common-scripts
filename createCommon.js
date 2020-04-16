@@ -4,6 +4,7 @@ const path = require('path')
 const ethers = require('ethers')
 const { getArcAndWallet, pathToABIs, CONTRACT_ADDRESSES, WALLET_ADDRESS } = require('./settings')
 const {getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory')
+// const {getForgeOrgData, getSetSchemesData } = require('commonfactory')
 const OVERRIDES =  { gasLimit: 750000, value: 0}
 
 async function createCommon() {
@@ -22,7 +23,8 @@ async function createCommon() {
             DAOFactoryInstance: DAOFACTORY_ADDRESS,
             orgName: 'Created by CommonScripts',
             founderAddresses: [WALLET_ADDRESS],
-            repDist: [100],
+            tokenDist: [0],
+            repDist: [100]
         })
     // console.log('FORGE ORG DATA: ', forgeOrgData);
     console.log(`Calling DAOFactory.forgeOrg(...)`)
