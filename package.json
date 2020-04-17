@@ -12,7 +12,8 @@
   },
   "scripts": {
     "createCommon": "nodejs createCommon.js",
-    "go": "nodejs index.js",
+    "createRequestToJoin": "nodejs createRequestToJoin.js",
+    "createFundingRequest": "nodejs createFundingRequest.js",
     "lint": "eslint ."
   }
 }

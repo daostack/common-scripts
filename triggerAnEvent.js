@@ -1,4 +1,3 @@
-// NOTW ORKING!
 const { first } = require('rxjs/operators')
 const assert = require('assert')
 const path = require('path')
@@ -9,7 +8,6 @@ const { getArcAndWallet, pathToABIs } = require('./settings')
 
 async function triggerEvent() {
 
-    throw Error('not working right now :-)')
     const { arc, wallet } = await getArcAndWallet()
     // latest settings are from https://daostack1.atlassian.net/wiki/spaces/CMN/pages/11731016/Developer+Resources
    // balance of current account

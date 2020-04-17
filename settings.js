@@ -31,9 +31,12 @@ const PRIVATE_KEY = 'D865F557C088E1F7BDFB87D359F9E244C73272BDC39CB7CC1898D7A348A
     const wallet = new ethers.Wallet(PRIVATE_KEY, arc.web3)
     return { arc, wallet }
 }
+const OVERRIDES =  { gasLimit: 7500000 }
+
 module.exports = { 
     WALLET_ADDRESS,
     getArcAndWallet, 
     pathToABIs,
-    CONTRACT_ADDRESSES
+    CONTRACT_ADDRESSES,
+    OVERRIDES
 }

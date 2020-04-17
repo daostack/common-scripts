@@ -3,7 +3,7 @@
 const path = require('path')
 const ethers = require('ethers')
 const { getArcAndWallet, pathToABIs, CONTRACT_ADDRESSES, WALLET_ADDRESS } = require('./settings')
-const {getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory')
+const { getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory')
 // const {getForgeOrgData, getSetSchemesData } = require('commonfactory')
 const OVERRIDES =  { gasLimit: 7500000, value: 0}
 
