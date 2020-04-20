@@ -13,10 +13,13 @@ const CONTRACT_ADDRESSES = require(path.join(require.resolve('@daostack/migratio
 
 
 // private key of this address: 
-const WALLET_ADDRESS = '0xea64B1E098432e12c51694648A21c57ACE7621c4'
-const PRIVATE_KEY = 'D865F557C088E1F7BDFB87D359F9E244C73272BDC39CB7CC1898D7A348A4BF2C'
+const ADDRESS_1 = '0xea64B1E098432e12c51694648A21c57ACE7621c4'
+const PRIVATE_KEY_1 = 'D865F557C088E1F7BDFB87D359F9E244C73272BDC39CB7CC1898D7A348A4BF2C'
 
-    async function getArcAndWallet() {
+const ADDRESS_2 = '0xb8a15CD235b34F52D5FeD7155dF2C07DE594e03e'
+const PRIVATE_KEY_2 = '015ECB47E92655A52A0A3ECF38D1CD3F4599CD09166A0FAC48F507F341F7C0FF'
+
+async function getArc() {
 
     const arc = new Arc({
         graphqlHttpProvider: "https://api.thegraph.com/subgraphs/name/daostack/v7_4_exp_rinkeby",
@@ -28,14 +31,19 @@ const PRIVATE_KEY = 'D865F557C088E1F7BDFB87D359F9E244C73272BDC39CB7CC1898D7A348A
     const infuraProvider = new ethers.providers.InfuraProvider('rinkeby', 'e0cdf3bfda9b468fa908aa6ab03d5ba2')
     arc.web3 = infuraProvider
 
-    const wallet = new ethers.Wallet(PRIVATE_KEY, arc.web3)
-    return { arc, wallet }
+    return arc
 }
-const OVERRIDES =  { gasLimit: 7500000 }
+const OVERRIDES =  { 
+    gasLimit: 10000000,
+    gasPrice: 1000000000,
+ }
 
 module.exports = { 
-    WALLET_ADDRESS,
-    getArcAndWallet, 
+    ADDRESS_1,
+    PRIVATE_KEY_1,
+    ADDRESS_2,
+    PRIVATE_KEY_2,
+    getArc, 
     pathToABIs,
     CONTRACT_ADDRESSES,
     OVERRIDES

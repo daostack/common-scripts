@@ -14,6 +14,8 @@
     "createCommon": "nodejs createCommon.js",
     "createRequestToJoin": "nodejs createRequestToJoin.js",
     "createFundingRequest": "nodejs createFundingRequest.js",
+    "stake": "nodejs stakeOnAProposal.js",
+    "play": "nodejs play.js",
     "lint": "eslint ."
   }
 }

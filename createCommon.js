@@ -2,7 +2,7 @@
 // 
 const path = require('path')
 const ethers = require('ethers')
-const { getArcAndWallet, pathToABIs, CONTRACT_ADDRESSES, WALLET_ADDRESS } = require('./settings')
+const { getArc, pathToABIs, CONTRACT_ADDRESSES, ADDRESS_1, PRIVATE_KEY_1} = require('./settings')
 const { getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory')
 // const {getForgeOrgData, getSetSchemesData } = require('commonfactory')
 const OVERRIDES =  { gasLimit: 7500000, value: 0}
@@ -11,7 +11,8 @@ async function createCommon() {
   const DAONAME = `Test DAO ${Math.floor(Math.random() * 100000)}`
   let tx;
   let receipt
-  const { arc, wallet } = await getArcAndWallet();
+  const arc = await getArc();
+  const wallet = new ethers.Wallet(PRIVATE_KEY_1, arc.web3)
   const daoFactoryAbi = require(path.join(pathToABIs, 'DAOFactory.json')).abi
   // getContract does not work the current client version, cf https://github.com/daostack/client/issues/445
   // const contract = arc.getContract(requestToJoinSchemeState.address, abi)
@@ -24,7 +25,7 @@ async function createCommon() {
       getForgeOrgData({
           DAOFactoryInstance: CONTRACT_ADDRESSES.DAOFactoryInstance,
           orgName: DAONAME,
-          founderAddresses: [WALLET_ADDRESS],
+          founderAddresses: [ADDRESS_1],
           repDist: [100]
       })
   tx = await daoFactoryContract.forgeOrg(...forgeOrgData, OVERRIDES)

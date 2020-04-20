@@ -2,14 +2,15 @@ const { first } = require('rxjs/operators')
 const assert = require('assert')
 const path = require('path')
 const ethers = require('ethers')
-const { getArcAndWallet, pathToABIs, WALLET_ADDRESS, OVERRIDES } = require('./settings')
+const { getArc, pathToABIs, WALLET_1, OVERRIDES } = require('./settings')
 
 
 async function createFundingRequest() {
 
-    const { arc, wallet } = await getArcAndWallet()
+    const arc = await getArcAndWallet()
     let tx
     let receipt
+    const wallet = new ethers.Wallet(PRIVATE_KEY_2, arc.web3)
     const daos = await arc.daos({where: {name: "Test DAO 76972"}}).first()
     const dao = daos[0]
     const daoState = await dao.fetchState()
