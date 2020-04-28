@@ -1,35 +1,31 @@
-// create a common DAO
-// 
-const path = require('path')
-const ethers = require('ethers')
-const { getArc, pathToABIs, CONTRACT_ADDRESSES, ADDRESS_1, PRIVATE_KEY_1} = require('./settings')
+const { getArc, ADDRESS_1, PRIVATE_KEY_1, ARC_VERSION, OVERRIDES } = require('./settings')
 const { getForgeOrgData, getSetSchemesData } = require('@daostack/common-factory')
-// const {getForgeOrgData, getSetSchemesData } = require('commonfactory')
-const OVERRIDES =  { gasLimit: 7500000, value: 0}
 
 async function createCommon() {
   const DAONAME = `Test DAO ${Math.floor(Math.random() * 100000)}`
   let tx;
   let receipt
   const arc = await getArc();
-  const wallet = new ethers.Wallet(PRIVATE_KEY_1, arc.web3)
-  const daoFactoryAbi = require(path.join(pathToABIs, 'DAOFactory.json')).abi
-  // getContract does not work the current client version, cf https://github.com/daostack/client/issues/445
-  // const contract = arc.getContract(requestToJoinSchemeState.address, abi)
 
-  console.log(`using DAOFactory instance @ ${CONTRACT_ADDRESSES.DAOFactoryInstance}`)
-  const daoFactoryContract = new ethers.Contract(CONTRACT_ADDRESSES.DAOFactoryInstance, daoFactoryAbi, wallet)
+  console.log(`fetching contractinfo from graphql...`)
+  const contractInfo = arc.getContractInfoByName(`DAOFactoryInstance`, ARC_VERSION)
+  const contractABI = arc.getABI( undefined, 'DAOFactory', ARC_VERSION)
+  const daoFactoryContract = await arc.getContract(contractInfo.address, contractABI)
+  const votingMachineInfo = arc.getContractInfoByName(`GenesisProtocol`, ARC_VERSION)
 
   console.log(`Calling DAOFactory.forgeOrg(...)`)
   const forgeOrgData = 
       getForgeOrgData({
-          DAOFactoryInstance: CONTRACT_ADDRESSES.DAOFactoryInstance,
+          DAOFactoryInstance: contractInfo.address,
           orgName: DAONAME,
           founderAddresses: [ADDRESS_1],
           repDist: [100]
       })
   tx = await daoFactoryContract.forgeOrg(...forgeOrgData, OVERRIDES)
+  console.log(`waiting for tx to be mined`)
+  console.log(`https://rinkeby.etherscan.io/tx/${tx.hash}`)
   receipt = await tx.wait()
+  console.log(`done!`)
   // get the new avatar address of the thing that was just created..
   const newOrgEvent = receipt.events.filter((e) => e.event === 'NewOrg')[0]
   const newOrgAddress = newOrgEvent.args['_avatar']
@@ -41,9 +37,9 @@ async function createCommon() {
   const deadline = (await arc.web3.getBlock('latest')).timestamp + 3000
   // console.log(deadline)
   const schemeData = getSetSchemesData({
-      DAOFactoryInstance: CONTRACT_ADDRESSES.DAOFactoryInstance,
+      DAOFactoryInstance: contractInfo.address,
       avatar: newOrgAddress,
-      votingMachine: CONTRACT_ADDRESSES.GenesisProtocol,
+      votingMachine: votingMachineInfo.address,
       fundingToken: '0x0000000000000000000000000000000000000000',
       minFeeToJoin: 100,
       memberReputation: 100,
@@ -53,6 +49,8 @@ async function createCommon() {
     })
 
   tx = await daoFactoryContract.setSchemes(...schemeData, OVERRIDES)
+  console.log(`waiting for tx to be mined`)
+  console.log(`https://rinkeby.etherscan.io/tx/${tx.hash}`)
   receipt = await tx.wait()
   console.log(`Created a DAO at ${newOrgAddress} with name "${DAONAME}"`)
 

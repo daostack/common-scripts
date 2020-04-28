@@ -3,7 +3,7 @@ const assert = require('assert')
 const path = require('path')
 const ethers = require('ethers')
 const { getArcAndWallet, pathToABIs, OVERRIDES } = require('./settings')
-const { DAO } = require('@daostack/client')
+const { DAO } = require('@daostack/arc.js')
 
 
 

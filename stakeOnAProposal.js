@@ -2,7 +2,7 @@
 const path = require('path')
 const ethers = require('ethers')
 const { getArc, pathToABIs, PRIVATE_KEY_2, ADDRESS_2 } = require('./settings')
-const { Proposal, IProposalOutcome, BN, OVERRIDES } = require('@daostack/client')
+const { Proposal, IProposalOutcome, BN, OVERRIDES } = require('@daostack/arc.js')
 
 
 // NOTE THAT THESE ADDRESSES MAY not work after 
